@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fides Clinic</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eaeaea;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1 {
+            background-color: orange;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            margin: 0;
+            font-size: 32px;
+            border-bottom: 4px solid orange;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            border-left: 6px solid orange;
+            padding-left: 15px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+            letter-spacing: 1.5px;
+            line-height: 1.4;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+            color: #444;
+            font-size: 16px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #fafafa;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: orange;
+            background-color: #fff;
+            outline: none;
+        }
+
+        input[type="date"] {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background-color: #fafafa;
+        }
+
+        select {
+            background: #fafafa url('data:image/svg+xml;base64,...') no-repeat right 12px center;
+            background-size: 20px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+            text-align: center;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        button:active {
+            background-color: #1e7e34;
+            transform: scale(0.98);
+        }
+
+        .gender-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .gender-group label {
+            margin-right: 15px;
+            font-size: 16px;
+        }
+
+        .gender-group input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'nav.html' %}
+    <div class="container">
+        <form id="doctorForm" method="post" action="{% url 'doctor_dashboard' %}">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <h2>Patient Information</h2>
+            <div class="form-group">
+                <label for="clock_number">Clock Number:</label>
+                <input type="text" id="clock_number" name="clock_number" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" class="form-control" value="" >
+            </div>
+
+            <!-- age -->
+            <div class="form-group">
+                <label for="age">Age:</label>
+                {{ form.age}}
+            </div>
+
+            <div class="form-group gender-group">
+                <label>Gender:</label>
+                <label><input type="radio" name="gender" value="Male" {% if form.gender.value == "Male" %}checked{% endif %}> Male</label>
+                <label><input type="radio" name="gender" value="Female" {% if form.gender.value == "Female" %}checked{% endif %}> Female</label>
+            </div>
+
+            <div class="form-group">
+                <label for="relationship">Next of Kin:</label>
+                {{ form.relationship }}
+            </div>
+
+            <div class="form-group">
+                <label for="vitals">Vitals</label>
+                {{ form.vitals }}
+            </div>
+      
+            <!-- ---------------------------------------------------end of patient information---------------------------------------------- -->
+
+            <h2>  </h2>
+            <div class="form-group">
+                <label for="chief_complaints">Chief Complaint: </label>
+                {{ form.chief_complaints }}
+            </div>
+            
+            <div class="form-group">
+                <label for="history_of_presenting_illness">History of Presenting Illness:</label>
+                {{ form.history_of_presenting_illness }}
+            </div>
+
+            <div class="form-group">
+                <label for="date_symptoms_aware">When did the patient first notice? (dd/mm/yyyy)</label>
+                {{ form.date_symptoms_aware }}
+            </div>
+
+            <div class="form-group">
+                <label>Has the patient had the same complaints before?</label>
+                <label><input type="radio" name="previous_complaints" value="False" {% if form.previous_complaints.value == False %}checked{% endif %}> No</label>
+                <label><input type="radio" name="previous_complaints" value="True" {% if form.previous_complaints.value == True %}checked{% endif %}> Yes</label>
+            </div>
+
+            <div class="form-group">
+                <label for="treatment_description">Description(if yes)</label>
+                {{ form.treatment_description }}
+            </div>
+
+            <!----------------------------------------------------------medical history -------------------------------------------------------------------->
+            <div class="form-group">
+                <label for="medical_history">Medical History | Surgery</label>
+                {{ form.medical_history }}
+            </div>
+
+            <div class="form-group">
+                <label for="medical_history">Examination</label>
+                {{ form.examination }}
+            </div>
+
+            <h2>Lab Test</h2>
+            <div class="form-group">
+                <label for="test_type">Test Type:</label>
+                {{ form.test_type }}
+            </div>
+            <div class="form-group">
+                <label for="description">Test Description:</label>
+                {{ form.description }}
+            </div>
+            <h2> </h2>
+            <div class="form-group">
+                <label for="diagnosis">Diagnosis:</label>
+                {{ form.diagnosis }}
+            </div>
+            <div class="form-group">
+                <label for="prescription">Treatment:</label>
+                {{ form.prescription }}
+            </div>
+
+            <div class="form-group">
+                <label for="medical_remarks"> Medical Remarks:</label>
+                {{ form.medical_remarks }}
+            </div>
+<!-- -------------------------------------------------------------------- remarks--------------------------------------------------------------------------- -->
+            <h2>Additional Information</h2>
+            <div class="form-group">
+                <label for="remarks">Remarks:</label>
+                {{ form.remarks }}
+            </div>
+            <button type="submit" style="color: orange; border: 2px solid orange; background-color: white; padding: 10px 20px; cursor: pointer; font-weight: bold;">Submit</button>
+        </form>
+    </div>
+</body>
+<script>
+    document.getElementById('id_clock_number').addEventListener('change', function() {
+        var clockNumber = this.value;
+
+        if (clockNumber) {
+            fetch(`/get-patient-details/?clock_number=${clockNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    const nameField = document.getElementById('id_name');
+                    const dobField = document.getElementById('id_dob');
+                    const clockNumberField = document.getElementById('id_clock_number');
+
+                    if (data.error) {
+                         clockNumberField.style.border = '2px solid red';
+                        nameField.value = '';
+                        dobField.value = '';
+                    } else {
+                         clockNumberField.style.border = '2px solid green';
+                        nameField.value = data.name;
+                        dobField.value = data.dob;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching patient details:', error);
+                     document.getElementById('id_clock_number').style.border = '2px solid red';
+                });
+        } else {
+             document.getElementById('id_clock_number').style.border = '';
+        }
+    });
+</script>
+
+<script>
+    document.getElementById('patientForm').addEventListener('submit', function(event) {
+        var clockNumberInput = document.getElementById('clock_number');
+
+        if (clockNumberInput.value.trim() === '') {
+            clockNumberInput.value = 'N/A';
+        }
+    });
+</script>
+
+ 
+<script>
+    document.getElementById('clock_number').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();  // Prevent form submission on Enter
+        }
+    });
+
+    document.getElementById('clock_number').addEventListener('change', function() {
+        var clockNumber = this.value;
+
+        if (clockNumber) {
+            fetch(`/get-employee/${clockNumber}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.name) {
+                        document.getElementById('name').value = data.name;
+                    } else {
+                        document.getElementById('name').value = '';
+                    }
+                })
+                .catch(error => console.error('Error fetching employee data:', error));
+        } else {
+            document.getElementById('name').value = '';
+        }
+    });
+</script>
+
+</body>
+</html>

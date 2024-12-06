@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fides Clinic</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                "paging": true,
+                "searching": false,
+                "lengthChange": true,
+                "ordering": true,
+                "order": [[0, "desc"]],
+                "pageLength": 25,
+                "columnDefs": [
+                    { "orderable": false, "targets": 0 }
+                ]
+            });
+        });
+    </script>
+    
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+    
+        header {
+            background-color: #ff7700;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 600;
+        }
+    
+        main {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+        }
+    
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        .filter-container form {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 1200px;
+        }
+    
+        .filter-container input[type="text"],
+        .filter-container select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 250px;
+            box-sizing: border-box;
+        }
+    
+        .filter-container input[type="submit"] {
+            padding: 12px 20px;
+            background-color: #fff;
+            color: #ff7700;
+            border: 2px solid #ff7700;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, color 0.3s, transform 0.2s;
+            min-width: 120px;
+        }
+    
+        .filter-container input[type="submit"]:hover {
+            background-color: #ff7700;
+            color: #fff;
+            border-color: #ff7700;
+            transform: scale(1.05);
+        }
+    
+        table thead{
+           background-color: orange;
+        }
+    
+        @media (max-width: 768px) {
+            .filter-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+    
+            .filter-container input[type="text"],
+            .filter-container select {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    
+        .filter-container input[type="date"] {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 250px;
+            background-color: #fff;
+            color: #333;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+    
+        .filter-container input[type="date"]:focus {
+            border-color: #ff7700;
+            box-shadow: 0 0 5px rgba(255, 119, 0, 0.5);
+            outline: none;
+        }
+
+        .filter-container .button {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #fff; 
+            color: #ff7700; 
+            border: 2px solid #ff7700;  
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s, color 0.3s, transform 0.2s;
+        }
+
+        .filter-container .button:hover {
+            background-color: #ff7700; 
+            color: #fff; 
+            border-color: #ff7700;  
+            transform: scale(1.05); 
+        }
+
+        .filter-container .button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 119, 0, 0.5);
+        }
+
+        .actions .button {
+            padding: 8px 16px;
+            background-color: #ff7700;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .actions .button:hover {
+            background-color: #e06600;
+            transform: scale(1.05);
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #ff7700;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #ff7700;
+            color: #fff;
+        }
+
+        .pagination .current {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #ff7700;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .filter-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-container input[type="text"],
+            .filter-container select {
+                width: 100%;
+                max-width: none;
+            }
+        }
+            .update-record-link {
+                display: inline-block;
+                padding: 12px 20px;
+                background-color: #fff;  
+                color: #ff7700;  
+                border: 2px solid #ff7700;  
+                border-radius: 8px;
+                text-decoration: none; 
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                transition: background-color 0.3s, color 0.3s, transform 0.2s;
+            }
+
+            .update-record-link:hover {
+                background-color: #ff7700;  
+                color: #fff;  
+                border-color: #ff7700;  
+                transform: scale(1.05);  
+            }
+
+            .update-record-link:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(255, 119, 0, 0.5);  
+            }
+
+            .clickable-row {
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .clickable-row:hover {
+                background-color: #f1f1f1; 
+            }
+
+            .filter-container input[type="date"] {
+                padding: 12px; 
+                border: 2px solid #ddd; 
+                border-radius: 8px; 
+                font-size: 16px; 
+                width: 100%; 
+                max-width: 250px; 
+                box-sizing: border-box; 
+                background-color: #fff; 
+                color: #333; 
+                transition: border-color 0.3s, box-shadow 0.3s;
+            }
+
+            .filter-container input[type="date"]:focus {
+                border-color: #ff7700; 
+                box-shadow: 0 0 5px rgba(255, 119, 0, 0.5); 
+                outline: none; 
+            }
+
+            @-webkit-keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+
+            input[type="date"]::-webkit-inner-spin-button,
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                border-radius: 50%; 
+            }
+
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                cursor: pointer;
+            }
+
+            .export-btn {
+                padding: 12px 20px;
+                background-color: #ff7700;  
+                color: #fff; 
+                border: none;  
+                border-radius: 8px;  
+                cursor: pointer;  
+                font-size: 16px;  
+                font-weight: bold;
+                transition: background-color 0.3s ease, transform 0.2s ease; 
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  
+            }
+
+            .export-btn:hover {
+                background-color: #e06600;  
+                transform: scale(1.05);  
+            }
+
+            .export-btn:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(255, 119, 0, 0.5);  
+            }
+
+            .apply-btn {
+                background-color: transparent;
+                color: orange;
+                border-width: 2px;
+                border-radius: 6px;
+                border-color: orange;
+                padding: 10px 15px;
+                cursor: pointer;
+                display: flex;
+                align-items: center; 
+            }
+
+            .apply-btn i {
+                margin-right: 5px; 
+            }
+
+            .apply-btn:hover {
+                background-color: #d0d7df; 
+            }
+
+    </style>
+</head>
+<body>
+    <body>
+        {% include 'hr_nav.html' %}
+        <main>
+            <div class="filter-container">
+                <form id="form1" method="GET" action="" class="filter-form">
+                    <input type="text" name="search_query" placeholder="Search by name or clock number..." value="{{ request.GET.search_query|default_if_none:'' }}">
+    
+                    <select name="gender_filter">
+                        <option value="">Filter by Gender</option>
+                        <option value="Male" {% if request.GET.gender_filter == "Male" %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if request.GET.gender_filter == "Female" %}selected{% endif %}>Female</option>
+                    </select>
+                    <label for="from_date">From:</label>
+                    <input type="date" name="start_date" value="{{ request.GET.start_date|default_if_none:'' }}">
+                    <label for="To_date">To:</label>
+                    <input type="date" name="end_date" value="{{ request.GET.end_date|default_if_none:'' }}">
+    
+                    <input type="submit" value="Apply" class="apply-btn">
+                    <button type="button" id="triggerButton" class="btn btn-primary" style="background-color: orange; border-color: darkorange; color: white; width: 200px;">
+                        <i class="fas fa-file-excel"></i> Export
+                    </button>       
+                </form>
+                
+            </div>
+                <form id="form2" method="POST" action="{% url 'hr_export_to_excel' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="search_query" value="{{ request.GET.search_query }}">
+                    <input type="hidden" name="gender_filter" value="{{ request.GET.gender_filter }}">
+                    <input type="hidden" name="month_filter" value="{{ request.GET.month_filter }}">
+                    <input type="hidden" name="start_date" value="{{ request.GET.start_date }}">
+                    <input type="hidden" name="end_date" value="{{ request.GET.end_date }}">
+                    <button type="submit" id="exportButton" class="btn btn-primary export-btn" style="display: none;"></button>
+                    <table >
+                        <thead>
+                            <tr>
+                                <th style="padding-left: 40px;">Select</th> 
+                                <th style="padding-left: 50px;" class="{% if sort_by == 'clock_number' %}sorted-{{ sort_order }}{% endif %}" data-sort="clock_number">Clock Number</th>
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'name' %}sorted-{{ sort_order }}{% endif %}" data-sort="name">Name</th>
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'age' %}sorted-{{ sort_order }}{% endif %}" data-sort="age">Age</th>
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'gender' %}sorted-{{ sort_order }}{% endif %}" data-sort="gender">Gender</th>
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'department' %}sorted-{{ sort_order }}{% endif %}" data-sort="department">Department</th>
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'designation' %}sorted-{{ sort_order }}{% endif %}" data-sort="designation">Designation</th>                    
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'relationship' %}sorted-{{ sort_order }}{% endif %}" data-sort="relationship">Next Of Kin</th>
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'remarks' %}sorted-{{ sort_order }}{% endif %}" data-sort="remarks">Remarks</th>
+                                <th style="padding-left: 60px;" class="{% if sort_by == 'created_at' %}sorted-{{ sort_order }}{% endif %}" data-sort="created_at">Date Created</th>
+                            </tr>                
+                        </thead>
+                        <tbody id="recordsTableBody">
+                            {% for record in records %}
+                                {% if record.clock_number != "N/A" and record.clock_number %}
+                                <tr class="clickable-row" data-record-id="{{ record.unique_code }}">
+                                    <td style="padding-left: 50px;" >
+                                        <input type="checkbox" id="record_{{ record.unique_code }}" name="selected_records" value="{{ record.unique_code }}" class="export-checkbox" style="display: inline;">
+                                    </td>
+                                    <td style="padding-left: 60px;" class="clock-number-cell">{{ record.clock_number|default:"N/A" }}</td> <!-- Clock number as Payroll Number -->
+                                    <td style="padding-left: 60px;" >{{ record.name|default:"N/A" }}</td>
+                                    <td style="padding-left: 50px;" >{{ record.age|default:"N/A" }}</td>
+                                    <td style="padding-left: 60px;" >{{ record.gender|default:"N/A" }}</td>
+                                    <td style="padding-left: 60px;" id="department_{{ record.unique_code }}">Loading...</td> <!-- Department will be filled here -->
+                                    <td style="padding-left: 60px;" id="designation_{{ record.unique_code }}">Loading...</td> <!-- Designation will be filled here -->
+                                    <td style="padding-left: 60px;" >{{ record.relationship|default:"N/A" }}</td>
+                                    <td style="padding-left: 60px;" >{{ record.remarks|default:"N/A" }}</td>
+                                    <td style="padding-left: 60px;" >{{ record.created_at|date:"F j, Y H:i"|default:"N/A" }}</td>
+                                </tr>
+                                {% endif %}
+                            {% empty %}
+                                <tr>
+                                    <td colspan="15" style="text-align: center;">No records found</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                        
+                    </table>
+                    
+                    <script>
+                        // Function to fetch and auto-populate department and designation for each record
+                        function autoFetchEmployeeDetails() {
+                            const rows = document.querySelectorAll('.clickable-row');
+                            
+                            rows.forEach(row => {
+                                const clockNumber = row.querySelector('.clock-number-cell').textContent.trim();
+                                const recordId = row.getAttribute('data-record-id');
+                        
+                                if (clockNumber && !isNaN(clockNumber)) {
+                                    // Fetch employee data based on clockNumber (payroll_number)
+                                    fetch(`/get_employee_data/?payroll_number=${clockNumber}`)
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Employee not found');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            if (data.department && data.designation) {
+                                                document.getElementById(`department_${recordId}`).textContent = data.department;
+                                                document.getElementById(`designation_${recordId}`).textContent = data.designation;
+                                            } else {
+                                                document.getElementById(`department_${recordId}`).textContent = "Not found";
+                                                document.getElementById(`designation_${recordId}`).textContent = "Not found";
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error fetching employee data:', error);
+                                            document.getElementById(`department_${recordId}`).textContent = "Not found";
+                                            document.getElementById(`designation_${recordId}`).textContent = "Not found";
+                                        });
+                                }
+                            });
+                        }
+                        
+                        // Call the function on page load to fetch details for each record
+                        window.onload = function() {
+                            autoFetchEmployeeDetails();
+                        };
+                        </script>
+                        
+                    
+                </form>
+            </main>   
+              
+            </div>
+       
+    <script>
+        let isCheckboxAdded = false;
+    
+        document.getElementById('toggle-checkboxes').addEventListener('click', function() {
+            if (!isCheckboxAdded) {
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach((row) => {
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = 'record_' + row.cells[1].innerText;  
+                    checkbox.name = 'selected_records';  
+                    checkbox.value = row.cells[1].innerText;  
+                    checkbox.classList.add('export-checkbox');
+                    
+
+                    const cell = row.insertCell(0);
+                    cell.appendChild(checkbox);
+    
+                    row.classList.remove('clickable-row');
+                    row.onclick = null; 
+                });
+    
+                isCheckboxAdded = true; 
+            }
+        });
+    </script>
+    <script>
+        document.getElementById("triggerButton").addEventListener("click", function() {
+            document.getElementById("form2").submit();
+        });
+    </script>
+    <script>
+        function toggleSelect() {
+            var checkbox = document.getElementById("toggleSelect");
+            var selectBox = document.getElementById("mySelect");
+            selectBox.disabled = !checkbox.checked;
+        }
+    </script>
+</body>
+    

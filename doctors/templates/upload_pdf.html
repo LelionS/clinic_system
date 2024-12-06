@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF and Extracted Content</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: orange;
+        }
+
+        .upload-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Extracted Content</h1>
+    <textarea id="contentField"></textarea>
+    <button onclick="copyContent()">Copy</button>
+</div>
+
+<div class="container upload-section">
+    <h1>Upload a PDF file</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+</div>
+
+<script>
+    var extracted_content = "{{ extracted_content|safe }}";
+    
+    document.getElementById("contentField").value = extracted_content.replace(/<br>/g, "\n");
+
+    function copyContent() {
+        var content = document.getElementById("contentField");
+        content.select();
+        content.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        
+        alert("Content copied to clipboard!");
+        window.location.href = "{% url 'lab_reports' %}"; 
+    }
+</script>
+
+</body>
+</html>

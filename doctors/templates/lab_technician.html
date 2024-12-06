@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Technician Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus {
+            border-color: orange;
+            outline: none;
+        }
+
+        .form-group p {
+            margin: 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .button-group {
+            text-align: center;
+        }
+
+        .button-group button {
+            border-color: orange;
+            border-width: 2px;
+            background-color: rgb(255, 255, 255);
+            color: orange;
+            font-weight: bold;
+            border-color: orange;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .button-group button:hover {
+            background-color: orange;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+
+        .alert-error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid orange;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #test-info {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        #message-box {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'lab_nav.html' %}
+    <div class="container">
+        <h2>Submit Test Information</h2>
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="unique_code">Enter Unique Code</label>
+                <input type="text" id="unique_code" name="unique_code" placeholder="Enter Unique Code" required>
+                <div class="loader" id="loader"></div>
+            </div>
+            <div id="test-info">
+                <p><strong style="font-style: italic; color: orange;">Test Type: </strong><span id="test_type"></span></p>
+                <p><strong style="font-style: italic; color: orange;">Description: </strong> <span id="description"></span></p>
+            </div>
+            {{ form.as_p }}    
+
+            <div class="form-group">
+                <input type="checkbox" id="urinalysisCheckbox" name="urinalysis" value="yes">
+                <label for="urinalysisCheckbox" style="font-weight: bold;">Urinalysis Test</label>
+            </div>
+
+            <div id="urinalysisInfo" style="display:none;">
+                <p><strong>Urinalysis Test Details:</strong></p>
+                <p>This test involves analyzing the urine for various substances and characteristics.</p>
+
+                <div class="form-group">
+                    <label for="leukocyteEsterase">Leukocyte Esterase:</label>
+                    <input type="text" id="leukocyteEsterase" name="leukocyteEsterase" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="nitrite">Nitrite:</label>
+                    <input type="text" id="nitrite" name="nitrite" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="urobilinogen">Urobilinogen:</label>
+                    <input type="text" id="urobilinogen" name="urobilinogen" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="protein">Protein:</label>
+                    <input type="text" id="protein" name="protein" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="ph">pH:</label>
+                    <input type="text" id="ph" name="ph" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="blood">Blood:</label>
+                    <input type="text" id="blood" name="blood" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="specificGravity">Specific Gravity:</label>
+                    <input type="text" id="specificGravity" name="specificGravity" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="ketones">Ketones:</label>
+                    <input type="text" id="ketones" name="ketones" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="bilirubin">Bilirubin:</label>
+                    <input type="text" id="bilirubin" name="bilirubin" placeholder="Enter value">
+                </div>
+                <div class="form-group">
+                    <label for="glucose">Glucose:</label>
+                    <input type="text" id="glucose" name="glucose" placeholder="Enter value">
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="bloodTestsCheckbox" name="blood_tests" value="yes">
+                <label for="bloodTestsCheckbox" style="font-weight: bold;">Blood Tests</label>
+            </div>
+            <div id="bloodTestsInfo" style="display:none;">
+                <p><strong>Blood Test Details:</strong></p>
+
+                <div class="form-group">
+                    <p><strong>Malaria Test:</strong></p>
+                    <input type="radio" id="malariaPositive" name="malaria_result" value="Positive">
+                    <label for="malariaPositive">Positive</label>
+                    <input type="radio" id="malariaNegative" name="malaria_result" value="Negative">
+                    <label for="malariaNegative">Negative</label>
+                </div>
+
+                <div class="form-group">
+                    <p><strong>Syphilis (VDRL) Test:</strong></p>
+                    <input type="radio" id="syphilisPositive" name="syphilis_result" value="Positive">
+                    <label for="syphilisPositive">Positive</label>
+                    <input type="radio" id="syphilisNegative" name="syphilis_result" value="Negative">
+                    <label for="syphilisNegative">Negative</label>
+                </div>
+
+                <div class="form-group">
+                    <p><strong>Pregnancy PDT Test:</strong></p>
+                    <input type="radio" id="pregnancyPositive" name="pregnancy_result" value="Positive">
+                    <label for="pregnancyPositive">Positive</label>
+                    <input type="radio" id="pregnancyNegative" name="pregnancy_result" value="Negative">
+                    <label for="pregnancyNegative">Negative</label>
+                </div>
+
+                <div class="form-group">
+                    <p><strong>H. pylori Ag Test:</strong></p>
+                    <input type="radio" id="hpyloriPositive" name="hpylori_result" value="Positive">
+                    <label for="hpyloriPositive">Positive</label>
+                    <input type="radio" id="hpyloriNegative" name="hpylori_result" value="Negative">
+                    <label for="hpyloriNegative">Negative</label>
+                </div>
+
+                <div class="form-group">
+                    <p><strong>Salmonella typhi (SAT) Test:</strong></p>
+                    <input type="radio" id="salmonellaPositive" name="salmonella_result" value="Positive">
+                    <label for="salmonellaPositive">Positive</label>
+                    <input type="radio" id="salmonellaNegative" name="salmonella_result" value="Negative">
+                    <label for="salmonellaNegative">Negative</label>
+                </div>
+
+                    <div class="form-group">
+                        <p><strong>HIV/PITC Test:</strong></p>
+                        <input type="radio" id="hivPositive" name="hiv_result" value="Positive">
+                        <label for="hivPositive">Positive</label>
+                        <input type="radio" id="hivNegative" name="hiv_result" value="Negative">
+                        <label for="hivNegative">Negative</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hemoglobin">Hemoglobin Level (HB):</label>
+                        <input type="text" id="hemoglobin" name="hemoglobin" placeholder="g/dl">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bloodSugar">Random Blood Sugar:</label>
+                        <input type="text" id="bloodSugar" name="bloodSugar" placeholder="mmols/l">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bloodGroup">Blood Group and Rhesus Factor:</label>
+                        <input type="text" id="bloodGroup" name="bloodGroup" placeholder="Enter blood group (e.g., A+, B-, etc.)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stool">Stool for O/C:</label>
+                        <input type="text" id="stool" name="stool" placeholder="Enter details">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="testResults">Test Results:</label>
+                    <textarea id="testResults" name="test_result" placeholder="Test Results" rows="8" cols="50" class="form-control" style="width: 100%; height: 200px;"></textarea>
+                </div>                
+                <div id="message-box"></div>
+                    <div class="button-group">
+                        <button type="submit">Submit</button>
+                    </div>
+            </form>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const radioButtons = document.querySelectorAll('input[type="radio"]');
+                const testResultsField = document.getElementById('testResults');
+            
+                radioButtons.forEach(function(radio) {
+                    radio.addEventListener('change', function() {
+                        const testName = this.closest('.form-group').querySelector('strong').textContent.replace(':', '');
+                        const result = this.value;
+                        updateTestResults(`${testName}: ${result}`);
+                    });
+                });
+            
+                
+                const hemoglobinInput = document.getElementById('hemoglobin');
+                const bloodSugarInput = document.getElementById('bloodSugar');
+                const bloodGroupInput = document.getElementById('bloodGroup');
+                const stoolInput = document.getElementById('stool');
+            
+                hemoglobinInput.addEventListener('input', function() {
+                    if (this.value.includes(';')) {
+                        updateTestResults(`Hemoglobin Level: ${this.value} g/dl`);
+                    }
+                });
+            
+                bloodSugarInput.addEventListener('input', function() {
+                    if (this.value.includes(';')) {
+                        updateTestResults(`Random Blood Sugar: ${this.value} mmols/l`);
+                    }
+                });
+            
+                bloodGroupInput.addEventListener('input', function() {
+                    if (this.value.includes(';')) {
+                        updateTestResults(`Blood Group: ${this.value}`);
+                    }
+                });
+            
+                stoolInput.addEventListener('input', function() {
+                    if (this.value.includes(';')) {
+                        updateTestResults(`Stool for O/C: ${this.value}`);
+                    }
+                });
+            
+                function updateTestResults(newEntry) {
+                    const currentResults = testResultsField.value;
+                    if (!currentResults.includes(newEntry)) {
+                        testResultsField.value = currentResults ? currentResults + '\n' + newEntry : newEntry;
+                    }
+                }
+            });
+            </script>
+            
+        <script>
+            function handleCheckbox(checkboxId, infoId) {
+                const checkbox = document.getElementById(checkboxId);
+                const info = document.getElementById(infoId);
+                checkbox.addEventListener('change', function() {
+                    info.style.display = this.checked ? 'block' : 'none'; 
+                });
+            }
+
+            handleCheckbox('urinalysisCheckbox', 'urinalysisInfo');
+            handleCheckbox('bloodTestsCheckbox', 'bloodTestsInfo');
+        </script>
+    </body>
+            
+
+    <script>
+        document.getElementById('urinalysisCheckbox').addEventListener('change', function() {
+            const urinalysisInfo = document.getElementById('urinalysisInfo');
+            urinalysisInfo.style.display = this.checked ? 'block' : 'none'; 
+        });
+
+        function autofillResults(parameterName, inputId) {
+            const inputField = document.getElementById(inputId);
+            const resultsField = document.getElementById('testResults');
+
+            inputField.addEventListener('keypress', function(event) {
+                if (event.key === ';') {
+                    const value = inputField.value.trim();
+                    if (value) {
+                        resultsField.value += `${parameterName}: ${value};\n`;
+                        inputField.value = ''; s
+                    }
+                }
+            });
+        }
+
+        autofillResults('Leukocyte Esterase', 'leukocyteEsterase');
+        autofillResults('Nitrite', 'nitrite');
+        autofillResults('Urobilinogen', 'urobilinogen');
+        autofillResults('Protein', 'protein');
+        autofillResults('pH', 'ph');
+        autofillResults('Blood', 'blood');
+        autofillResults('Specific Gravity', 'specificGravity');
+        autofillResults('Ketones', 'ketones');
+        autofillResults('Bilirubin', 'bilirubin');
+        autofillResults('Glucose', 'glucose');
+    </script>
+</body>
+
+
+        
+        {% for message in messages %}
+            <div class="alert {% if message.type == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                {{ message.content }}
+            </div>
+        {% endfor %}
+
+        <script>
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func.apply(this, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            document.getElementById('unique_code').addEventListener('input', debounce(function() {
+                const uniqueCode = this.value;
+                const loader = document.getElementById('loader');
+                const testInfoDiv = document.getElementById('test-info');
+                const testType = document.getElementById('test_type');
+                const description = document.getElementById('description');
+                const messageBox = document.getElementById('message-box');
+
+                if (uniqueCode.length > 0) {
+                    loader.style.display = 'inline-block'; 
+
+                    fetch("{% url 'check_unique_code' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: new URLSearchParams({
+                            'unique_code': uniqueCode
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        loader.style.display = 'none'; 
+                        if (data.valid) {
+                            testType.textContent = data.test_type;
+                            description.textContent = data.description;
+                            testInfoDiv.style.display = 'block';
+                            messageBox.innerHTML = ''; 
+                        } else {
+                            messageBox.innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                } else {
+                    loader.style.display = 'none'; 
+                    testInfoDiv.style.display = 'none'; 
+                    messageBox.innerHTML = ''; 
+                }
+            }, 500)); 
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fides Clinic</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/f24543c7ca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            padding-top: 70px; 
+        }
+
+        #header {
+            height: 70px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            position: fixed;  
+            top: 0;
+            width: 100%;
+            z-index: 1000;  
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  
+        }
+
+        #navbar {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            margin-left: auto; 
+        }
+
+        #navbar li {
+            margin-right: 20px;
+            position: relative;  
+        }
+
+        #navbar a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 10px 10px;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        #navbar a.active {
+            color: rgb(220, 137, 48);
+            font-weight: bold;
+            padding: 10px 20px;
+            letter-spacing: 1px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        #navbar a.active::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 25%;
+            height: 2px;
+            background-color: rgb(220, 137, 48);
+            transition: width 0.3s ease-in-out;
+        }
+
+        #navbar a.active:hover::before {
+            width: 70%;
+        }
+
+        #navbar #search-container {
+            position: relative;
+        }
+
+        #search-form {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            top: 100%;  
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+            padding: 5px;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #search-form input {
+            flex-grow: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #search-form button {
+            display: none;  
+        }
+
+        #search-form.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <section id="header" style="height: 70px;">
+        <a href="#"><img src="{% static 'img/logo.png' %}" class="logo" alt="Logo" style="height: 170px; width: auto;"></a>
+        <div>
+            <ul id="navbar" style="padding-left: 1050px;">
+                <li id="search-container">
+                    <i id="search-icon" class="fas fa-search" style="cursor: pointer; font-size: 24px;"></i>
+                    <form id="search-form" method="get" action="">
+                        <input id="clock-number-input" type="text" name="clock_number" placeholder="Enter Clock Number">
+                    </form>
+                </li>
+                <p style="padding-left:100px;"><B>{{ user.username }}!<B></p>
+                    <li><a href="{% url 'logout' %}" style="padding-left: 30px;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+        </div>
+    </section>
+    <script type="text/javascript">
+        let inactivityTimeout;
+        let warningTimeout;
+        let countdown;
+    
+        function resetInactivityTimeout() {
+            clearTimeout(inactivityTimeout);
+            clearTimeout(warningTimeout);
+            clearTimeout(countdown);
+    
+            inactivityTimeout = setTimeout(() => {
+                showWarning();
+            }, 300000); 
+    
+            warningTimeout = setTimeout(() => {
+                autoLogout();
+            }, 1800000); 
+        }
+    
+        function showWarning() {
+            let countdownValue = 300;
+            const warningBox = document.createElement('div');
+            warningBox.id = 'sessionWarning';
+            warningBox.innerHTML = `
+                <div style="background: #f9f9f9; border: 2px solid orange; border-radius: 10px; padding: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);">
+                    <h3 style="color: orange; margin: 0 0 10px;">Session Warning</h3>
+                    <p style="margin: 0 0 10px;">Your session will expire in <span id="countdown">1:00</span>. Click below to keep your session alive.</p>
+                    <button id="keepAliveBtn" style="background: white; color: orange; border: none; border-radius: 5px; padding: 10px 15px; cursor: pointer; transition: background 0.3s;">
+                        Keep My Session Alive
+                    </button>
+                </div>`;
+            document.body.appendChild(warningBox);
+    
+            document.getElementById('keepAliveBtn').onclick = () => {
+                renewSession();
+                document.body.removeChild(warningBox);
+            };
+    
+            countdown = setInterval(() => {
+                countdownValue--;
+                document.getElementById('countdown').innerText = `${Math.floor(countdownValue / 60)}:${String(countdownValue % 60).padStart(2, '0')}`;
+                if (countdownValue <= 0) {
+                    clearInterval(countdown);
+                    document.body.removeChild(warningBox);
+                    autoLogout();
+                }
+            }, 1000);
+        }
+    
+        function renewSession() {
+            fetch("{% url 'renew_session' %}", {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'session_renewed') {
+                    resetInactivityTimeout();
+                }
+            });
+        }
+    
+        function autoLogout() {
+            fetch("{% url 'auto_logout' %}", {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'logged_out') {
+                    window.location.href = "{% url 'login' %}";
+                }
+            });
+        }
+    
+        window.onload = resetInactivityTimeout;
+        document.onmousemove = resetInactivityTimeout;
+        document.onkeydown = resetInactivityTimeout;
+        document.onclick = resetInactivityTimeout;
+    </script>
+    
+</body>
+</html>

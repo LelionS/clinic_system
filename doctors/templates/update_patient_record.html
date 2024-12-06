@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fides Clinic</title>
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f8ff, #e0e0e0);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            width: 97%; 
+            max-width: 1300px;  
+            padding: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .form-container:hover {
+            transform: translateY(-0.5px);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #646262;
+            font-size: 16px;
+            font-style: italic;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;  
+        }
+
+        .form-row .form-group {
+            flex: 1;  
+            min-width: 200px;  
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select {
+            width: 97%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+            background-color: #fafafa;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: orange;
+            box-shadow: 0 0 5px rgba(255, 165, 0, 0.5);  
+        }
+
+        .errorlist {
+            color: #d32f2f;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            text-align: center;
+        }
+
+        .button-group button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border-color: orange;
+            color: orange; 
+            background: #ffffff; 
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .button-group button:hover {
+            background: orange; 
+            color: #f0f8ff;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;  
+            }
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <h4>Patient Information</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="unique_code">Unique Code</label>
+                    <input type="text" name="unique_code" value="{{ patient.unique_code }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="clock_number">Clock Number</label>
+                    <input type="text" name="clock_number" value="{{ form.clock_number.value|default_if_none:'' }}" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" value="{{ form.name.value|default_if_none:'' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="age" name="age" value="{{ form.age.value|default_if_none:'' }}" style="border: transparent;">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="relationship">Next Of Kin</label>
+                    <input type="text" name="relationship" value="{{ form.relationship.value|default_if_none:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select name="gender" disabled>
+                        <option value="Male" {% if form.gender.value == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if form.gender.value == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if form.gender.value == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                    <input type="hidden" name="gender" value="{{ form.gender.value }}">
+                </div>                
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vitals">vitals</label>
+                    <input type="text" name="vitals" value="{{ form.vitals.value|default_if_none:'' }}" >
+                </div>
+            </div>
+            <h4>Examination</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="chief_complaints">chief complaints</label>
+                    <textarea name="chief_complaints" rows="4">{{ form.chief_complaints.value|default_if_none:'' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="history_of_presenting_illness">History of Presenting Illness</label>
+                    <textarea name="history_of_presenting_illness" rows="4">{{ form.history_of_presenting_illness.value|default_if_none:'' }}</textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="date_symptoms_aware">When did the patient first notice?</label>
+                    <input type="date" name= "date_symptoms_aware"  value="{{ form.date_symptoms_aware.value|default_if_none:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="previous_complaints">previous complaints </label>
+                    <input type="text" name="previous_complaints" value="{{ form.previous_complaints.value|default_if_none:'' }}">
+                </div>
+            </div>
+           
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="treatment_description">Treatment Description</label>
+                    <input type="text" name="treatment_description" value="{{ form.treatment_description.value|default_if_none:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="medical_history">History of Allergies | Blood Transfusion | Surgery History</label>
+                    <input type="text" name="medical_history" value="{{ form.medical_history.value|default_if_none:'' }}">
+                </div>              
+            </div>
+            <h4>Test</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="test_type">Test Type</label>
+                    <textarea name="test_type">{{ form.test_type.value|default_if_none:'' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="description">Test Description</label>
+                    <textarea name="description">{{ form.description.value|default_if_none:'' }}</textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="test_result">Test Result</label>
+                    <textarea name="test_result">{{ form.test_result.value|default_if_none:'' }}</textarea>
+                </div>  
+            </div>
+
+            <h4>Treatment</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="diagnosis">Diagnosis</label>
+                    <textarea name="diagnosis">{{ form.diagnosis.value|default_if_none:'' }}</textarea>
+                </div>   
+                <div class="form-group">
+                    <label for="prescription">Treatment</label>
+                    <textarea name="prescription">{{ form.prescription.value|default_if_none:'' }}</textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="medical_remarks">Medical Remarks</label>
+                    <textarea name="medical_remarks" rows="4">{{ form.medical_remarks.value|default_if_none:'' }}</textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <h4>Remarks</h4>
+                    <textarea name="remarks" rows="4">{{ form.remarks.value|default_if_none:'' }}</textarea>
+                </div>
+            </div>
+            <div class="button-group">
+            <button><a href="{% url 'patient_history' %}" class="btn btn-secondary" style="text-decoration: none; color: orange;">Back to Lab Reports</a></button>
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

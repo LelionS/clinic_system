@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fides Clinic</title>
+    <style>
+        :root {
+            --primary-color: orange;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-color: #dee2e6;
+            --text-color: #333;
+            --heading-color: orange;
+            --hover-bg: #e2e6ea;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border-radius: 12px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--heading-color);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        table th {
+            background-color: var(--primary-color);
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        table tr:hover {
+            background-color: var(--hover-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+
+        table td {
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .empty-message {
+            text-align: center;
+            color: var(--secondary-color);
+            font-style: italic;
+            padding: 20px;
+            font-size: 1.2rem;
+        }
+
+        .print-btn, .export-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 25px;
+            background-color: var(--primary-color);
+            color: #fff;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .print-btn:hover, .export-btn:hover {
+            background-color: orange;
+            transform: translateY(-2px);
+        }
+
+        /* Print Styling */
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+                font-size: 12pt; /* Adjust font size for printing */
+            }
+
+            .container {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 1.5rem;  
+                border-bottom: none;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                box-shadow: none;
+            }
+
+            table th, table td {
+                padding: 10px;
+                border: 1px solid var(--border-color);
+            }
+
+            table th {
+                background-color: var(--primary-color);
+                color: #fff;
+            }
+
+            table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            .empty-message {
+                font-size: 1rem;
+                color: var(--secondary-color);
+                padding: 10px;
+            }
+
+            @page {
+                size: A4 landscape;  
+                margin: 20mm;
+            }
+
+            .print-btn, .export-btn {
+                display: none; 
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            table, th, td {
+                display: block;
+                width: 100%;
+            }
+
+            table th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            table tr {
+                border: 1px solid var(--border-color);
+                margin-bottom: 15px;
+                display: block;
+                border-radius: 6px;
+                background-color: var(--card-bg);
+                box-shadow: var(--card-shadow);
+                padding: 10px;
+            }
+
+            table td {
+                border: none;
+                display: block;
+                font-size: 0.95em;
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+                padding-bottom: 12px;
+                padding-top: 12px;
+            }
+
+            table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: var(--secondary-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Patient Records for Clock Number: {{ clock_number }}</h1>
+        
+        {% if records %}
+            <button class="export-btn" onclick="exportTableToCSV('patient_records.csv')">Export to CSV</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Unique Code</th>
+                        <th>Name</th>
+                        <th>Date of Birth</th>
+                        <th>Test Type</th>
+                        <th>Test Result</th>
+                        <th>Date Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                        <tr>
+                            <td data-label="Unique Code">{{ record.unique_code }}</td>
+                            <td data-label="Name">{{ record.name }}</td>
+                            <td data-label="Date of Birth">{{ record.dob }}</td>
+                            <td data-label="Test Type">{{ record.test_type }}</td>
+                            <td data-label="Test Result">{{ record.test_result }}</td>
+                            <td data-label="Date Created">{{ record.created_at }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-message">No records found for this clock number.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-message">No records found for this clock number.</p>
+        {% endif %}
+    </div>
+ 
+    <script>
+        function exportTableToCSV(filename) {
+            var csv = [];
+            var rows = document.querySelectorAll("table tr");
+
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll("td, th");
+
+                for (var j = 0; j < cols.length; j++) {
+                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');  
+                }
+
+                csv.push(row.join(","));
+            }
+
+            var csvFile;
+            var downloadLink;
+
+            csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+
+            downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+
+            downloadLink.click();
+        }
+    </script>
+</body>
+</html>
