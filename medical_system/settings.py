@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8!ot6ng=4&q#eyvzc#kl@1w0(*z7!_*(@nxjpp*&8gu5@%f+$&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'medical_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'clinic',        
         'USER': 'root',              
         'PASSWORD': '8998',       

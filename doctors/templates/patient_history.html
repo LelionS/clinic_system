@@ -402,11 +402,11 @@
                                     <td style="padding-left: 40px;" class="actions">
                                         <a href="{% url 'update_patient_record' record.unique_code %}" class="update-record-link" style="background-color: transparent; border-color: transparent;">
                                             {% if record.test_type and not record.test_result %}
-                                                <span style="background-color: transparent; padding: 5px 10px; display: inline-flex; align-items: center;">
+                                                <span style="background-color: transparent; padding: 5px 10px; color: orange; display: inline-flex; align-items: center;">
                                                     <i class="fas fa-hourglass-half pending-icon" style="margin-right: 5px;"></i> Pending
                                                 </span>
                                             {% else %}
-                                                <span style="background-color: transparent; border-radius: 15px; padding: 5px 10px; color: #034d09; display: inline-flex; align-items: center; position: relative;">
+                                                <span style="background-color: transparent; border-radius: 15px; padding: 5px 10px; color: #1a5cb3; display: inline-flex; align-items: center; position: relative;">
                                                     <i class="fas fa-star done-icon" style="margin-right: 5px;"></i> Done
                                                     <span class="sparkle"></span>
                                                 </span>
@@ -451,7 +451,7 @@
                                                 position: absolute;
                                                 width: 10px;
                                                 height: 10px;
-                                                background: radial-gradient(circle, #00ff4c 0%, transparent 70%);
+                                                background: radial-gradient(circle, #1a80df 0%, transparent 70%);
                                                 border-radius: 50%;
                                                 animation: sparkle-move 1.5s linear infinite;
                                                 z-index: -1;

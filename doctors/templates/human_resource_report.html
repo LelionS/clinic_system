@@ -178,34 +178,21 @@
             transform: scale(1.05);
         }
 
-        .pagination {
-            text-align: center;
-            margin-top: 20px;
+        .loading-icon {
+            font-size: 24px; 
+            color: #ffcc00;  
+            animation: spin 1.5s linear infinite; 
+            margin-right: 5px;
+             }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        .pagination a {
-            padding: 10px 20px;
-            margin: 0 5px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #ff7700;
-            font-weight: 600;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .pagination a:hover {
-            background-color: #ff7700;
-            color: #fff;
-        }
-
-        .pagination .current {
-            padding: 10px 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #ff7700;
-            color: #fff;
-        }
 
         @media (max-width: 768px) {
             .filter-container {
@@ -395,7 +382,10 @@
                                     <td style="padding-left: 60px;" >{{ record.name|default:"N/A" }}</td>
                                     <td style="padding-left: 50px;" >{{ record.age|default:"N/A" }}</td>
                                     <td style="padding-left: 60px;" >{{ record.gender|default:"N/A" }}</td>
-                                    <td style="padding-left: 60px;" id="department_{{ record.unique_code }}">Loading...</td> <!-- Department will be filled here -->
+                                    <td style="padding-left: 60px;" id="department_{{ record.unique_code }}">
+                                        <i class="fas fa-spinner loading-icon"></i> Loading...
+                                    </td>
+                            
                                     <td style="padding-left: 60px;" id="designation_{{ record.unique_code }}">Loading...</td> <!-- Designation will be filled here -->
                                     <td style="padding-left: 60px;" >{{ record.relationship|default:"N/A" }}</td>
                                     <td style="padding-left: 60px;" >{{ record.remarks|default:"N/A" }}</td>

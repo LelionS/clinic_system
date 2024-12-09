@@ -1,3 +1,5 @@
+import os
+import openpyxl
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -14,6 +16,17 @@ from django.urls import reverse
 from .forms import PatientForm  
 from datetime import datetime
 from django.contrib.auth import update_session_auth_hash
+from django.utils.timezone import localtime
+from django.core.files.storage import FileSystemStorage
+from .forms import PDFUploadForm
+from .models import ExtractedData
+from .utils import extract_content_from_pdf  
+from django.views.decorators.csrf import csrf_exempt
+from .models import PatientRecord  
+from django.contrib import messages
+from .forms import UploadFileForm
+from .models import Employee
+from openpyxl import load_workbook
 
 def login_view(request):
     if request.method == 'POST':
@@ -414,7 +427,7 @@ def export_to_excel(request):
         'Treatment': [record.prescription for record in records],
         'medical remarks':[record.medical_remarks for record in records],
         'Remarks': [record.remarks for record in records],
-        'Date Created': [record.created_at.strftime('%Y-%m-%d %H:%M:%S') if record.created_at else '' for record in records],
+        'Date Created': [localtime(record.created_at).strftime('%Y-%m-%d %H:%M:%S') if record.created_at else '' for record in records],
     }
 
     df = pd.DataFrame(data)
@@ -493,7 +506,7 @@ def hr_export_to_excel(request):
         'age': [record.age for record in records],
         'Next Of Kin': [record.relationship for record in records],     
         'Remarks': [record.remarks for record in records],
-        'Date Created': [record.created_at.strftime('%Y-%m-%d %H:%M:%S') if record.created_at else '' for record in records],
+        'Date Created': [localtime(record.created_at).strftime('%Y-%m-%d %H:%M:%S') if record.created_at else '' for record in records],
     }
 
     df = pd.DataFrame(data)
@@ -581,17 +594,7 @@ def renew_session(request):
         return JsonResponse({'status': 'session_renewed'})
     return JsonResponse({'status': 'not_authenticated'})
 
-
-
-
-# ---------------------------------------------------------------------------------------------------------------------------------
-
-from django.core.files.storage import FileSystemStorage
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import PatientRecord
-from .forms import PatientRecordForm
-
+@login_required
 def submit_test_info(request):
     if request.method == 'POST':
         form = PatientRecordForm(request.POST, request.FILES)  
@@ -620,29 +623,7 @@ def submit_test_info(request):
 
     return render(request, 'lab_technician.html', {'form': form})
 
-
-# ---------------------------------------------------------------------------------------------------------------------------------
-from django.shortcuts import render, redirect
-from .forms import PDFUploadForm
-from .models import ExtractedData
-from .utils import extract_content_from_pdf  
-import os
-
-# myapp/views.py
-
-from django.shortcuts import render, redirect
-from .forms import PDFUploadForm
-from .models import ExtractedData
-from .utils import extract_content_from_pdf
-import os
-from django.views.decorators.csrf import csrf_exempt
-
-from django.shortcuts import render, redirect
-from .forms import PDFUploadForm
-from .models import ExtractedData
-from .utils import extract_content_from_pdf  # Ensure this function is defined to extract text from the PDF
-import os
-
+@login_required
 def upload_pdf_view(request):
     if request.method == 'POST':
         form = PDFUploadForm(request.POST, request.FILES)
@@ -650,26 +631,19 @@ def upload_pdf_view(request):
             pdf_file = request.FILES['pdf_file']
             file_path = os.path.join('uploads', pdf_file.name)
 
-            # Ensure the 'uploads' directory exists
             if not os.path.exists('uploads'):
                 os.makedirs('uploads')
 
-            # Save the uploaded PDF to the 'uploads' directory
             with open(file_path, 'wb+') as destination:
                 for chunk in pdf_file.chunks():
                     destination.write(chunk)
 
-            # Extract content from the PDF using the utility function
             extracted_content, _ = extract_content_from_pdf(file_path)
 
-            # Replace newline characters with <br> tags for HTML formatting
             formatted_content = extracted_content.replace('\n', '<br>')
 
-            # Save the extracted content to the database (optional)
             extracted_data = ExtractedData(content=formatted_content)
             extracted_data.save()
-
-            # Pass the formatted content to the success page
             return render(request, 'lab_success.html', {'extracted_content': formatted_content})
     else:
         form = PDFUploadForm()
@@ -678,35 +652,26 @@ def upload_pdf_view(request):
 
 
 
-
+@login_required
 def success_view(request):
     return render(request, 'upload_pdf.html')
 
-from django.shortcuts import render, redirect
-from .forms import PatientRecordForm
-
+@login_required
 def save_patient_record(request):
     if request.method == 'POST':
         form = PatientRecordForm(request.POST)
         if form.is_valid():
             patient_record = form.save(commit=False)
             extracted_content = request.POST.get('extracted_content')
-            # Process extracted content here if needed
-            patient_record.save()  # Save the patient record
-            return redirect('lab_report')  # Redirect after saving
+
+            patient_record.save() 
+            return redirect('lab_report')  
     else:
         form = PatientRecordForm()
 
     return render(request, 'lab_report.html', {'form': form})
 
-from django.http import JsonResponse
-
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
-from .models import PatientRecord  
-
+@login_required
 @csrf_exempt  
 def upload_pdf(request):
     if request.method == "POST":
@@ -731,24 +696,6 @@ def upload_pdf(request):
             return JsonResponse({'success': False, 'error': 'No PDF file was uploaded.'})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
-
-
-
-import openpyxl
-from django.shortcuts import render
-from django.contrib import messages
-from .forms import UploadFileForm
-from .models import Employee
-
-from django.contrib import messages
-from openpyxl import load_workbook
-from .models import Employee
-from .forms import UploadFileForm
-
-from django.contrib import messages
-from openpyxl import load_workbook
-from .models import Employee
-from .forms import UploadFileForm
 
 @login_required
 def upload_file(request):
@@ -799,12 +746,10 @@ def upload_file(request):
     return render(request, 'upload.html', {'form': form})
 
 
-from django.http import JsonResponse
-from .models import Employee
 
+@login_required
 def get_employee(request, clock_number):
     try:
-        # Assuming payroll_number is the clock_number
         employee = Employee.objects.get(payroll_number=clock_number, status=True)
         return JsonResponse({'name': employee.name})
     except Employee.DoesNotExist:
@@ -813,9 +758,7 @@ def get_employee(request, clock_number):
         return JsonResponse({'error': str(e)})
 
 
-from django.http import JsonResponse
-from .models import Employee
-
+@login_required
 def get_employee_data(request):
     payroll_number = request.GET.get('payroll_number')
     try:

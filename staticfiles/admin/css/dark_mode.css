@@ -1,6 +1,6 @@
 @media (prefers-color-scheme: dark) {
     :root {
-      --primary: #264b5d;
+      --primary: orange;
       --primary-fg: #f7f7f7;
   
       --body-fg: #eeeeee;
@@ -37,7 +37,7 @@
 
 
 html[data-theme="dark"] {
-    --primary: #264b5d;
+    --primary: orange;
     --primary-fg: #f7f7f7;
 
     --body-fg: #eeeeee;
